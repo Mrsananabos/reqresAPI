@@ -1,23 +1,18 @@
 package com.reqres;
 
 
-import io.restassured.RestAssured;
 import org.json.JSONObject;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
 import static org.hamcrest.CoreMatchers.is;
 
-public class ReqresAPITest {
-
-    @BeforeAll
-    static void configureBeforeAll() {
-        RestAssured.baseURI = "https://reqres.in/";
-    }
+public class ReqresAPITest extends TestBase {
 
     @Test
+    @DisplayName("Проверка корректного создания пользователя")
     void createUserTest() {
         JSONObject requestBody = new JSONObject()
                 .put("name", "Oleg")
@@ -33,12 +28,13 @@ public class ReqresAPITest {
                 .then()
                 .log().status()
                 .log().body()
-                .statusCode(201)
+                .statusCode(STATUS_CODE_201)
                 .body("name", is("Oleg"))
                 .body("job", is("developer"));
     }
 
     @Test
+    @DisplayName("Проверка успешной авторизации пользователя")
     void loginSuccessfulUserTest() {
         JSONObject requestBody = new JSONObject()
                 .put("email", "eve.holt@reqres.in")
@@ -54,11 +50,12 @@ public class ReqresAPITest {
                 .then()
                 .log().status()
                 .log().body()
-                .statusCode(200)
+                .statusCode(STATUS_CODE_200)
                 .body("token", is("QpwL5tke4Pnpja7X4"));
     }
 
     @Test
+    @DisplayName("Проверка неуспешной авторизации пользователя")
     void loginUnsuccessfulUserTest() {
         JSONObject requestBody = new JSONObject()
                 .put("email", "peter@klaven");
@@ -73,11 +70,12 @@ public class ReqresAPITest {
                 .then()
                 .log().status()
                 .log().body()
-                .statusCode(400)
+                .statusCode(STATUS_CODE_400)
                 .body("error", is("Missing password"));
     }
 
     @Test
+    @DisplayName("Проверка успешной регистрации пользователя")
     void registerSuccessfulUserTest() {
         JSONObject requestBody = new JSONObject()
                 .put("email", "eve.holt@reqres.in")
@@ -93,12 +91,13 @@ public class ReqresAPITest {
                 .then()
                 .log().status()
                 .log().body()
-                .statusCode(200)
+                .statusCode(STATUS_CODE_200)
                 .body("id", is(4))
                 .body("token", is("QpwL5tke4Pnpja7X4"));
     }
 
     @Test
+    @DisplayName("Проверка неуспешной регистрации пользователя")
     void registerUnsuccessfulUserTest() {
         JSONObject requestBody = new JSONObject()
                 .put("email", "sydney@fife");
@@ -113,7 +112,7 @@ public class ReqresAPITest {
                 .then()
                 .log().status()
                 .log().body()
-                .statusCode(400)
+                .statusCode(STATUS_CODE_400)
                 .body("error", is("Missing password"));
     }
 
