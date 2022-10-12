@@ -1,7 +1,12 @@
 package com.reqres;
 
 
+import com.reqres.pojo.UserDTO;
+import com.reqres.pojo.domain.User;
+import com.reqres.pojo.domain.UserMapper;
+import com.reqres.pojo.remote.UserDataRemote;
 import org.json.JSONObject;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -14,23 +19,50 @@ public class ReqresAPITest extends TestBase {
     @Test
     @DisplayName("Проверка корректного создания пользователя")
     void createUserTest() {
-        JSONObject requestBody = new JSONObject()
-                .put("name", "Oleg")
-                .put("job", "developer");
+//        JSONObject requestBody = new JSONObject()
+//                .put("name", "Oleg")
+//                .put("job", "developer");
 
-        given()
+        UserDTO user = new UserDTO();
+        user.name = "Oleg";
+        user.job = "developer";
+
+
+        UserDTO response = given()
                 .log().uri()
                 .log().body()
                 .contentType(JSON)
-                .body(requestBody.toString())
+                .body(user)
                 .when()
                 .post("/api/users")
                 .then()
                 .log().status()
                 .log().body()
                 .statusCode(STATUS_CODE_201)
-                .body("name", is("Oleg"))
-                .body("job", is("developer"));
+                .extract().as(UserDTO.class);
+
+        Assertions.assertEquals(user.name, response.name);
+    }
+
+    @Test
+    @DisplayName("Получение пользователя с id = 2")
+    void getUserTest() {
+
+        UserDataRemote response = given()
+                .log().uri()
+                .log().body()
+                .contentType(JSON)
+                .when()
+                .get("/api/users/2")
+                .then()
+                .log().status()
+                .log().body()
+                .statusCode(STATUS_CODE_200)
+                .extract().as(UserDataRemote.class);
+
+        User user = UserMapper.map(response.data);
+
+        Assertions.assertEquals(user.contact.email, response.data.email);
     }
 
     @Test
